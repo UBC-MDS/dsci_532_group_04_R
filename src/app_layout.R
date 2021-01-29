@@ -40,7 +40,7 @@ world_map = dbcCard(
       dbcCardHeader("Life Expectancy Snapshot", className="cursive",style=list('font-weight'='900')),
       dbcCardBody(
         children = list(
-          dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = 800, 'height' = 500))
+          dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = 800, 'height' = 270))
           )
         )
       )
@@ -182,14 +182,13 @@ app$callback(
 function(year_range){
   chosen_starting_year = year_range[1]
   chosen_ending_year = year_range[2]
-  df <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
+  
+  df <- read.csv('data/raw/2014_world_gdp.csv')
   
   # Compute the mean of life expectancy
   # Make a copy of the dataset
   data<- data.frame(dataset)
-    
   data_mean<- data %>% filter(year>={{chosen_starting_year}}, year<={{chosen_ending_year}}) %>% group_by(country) %>% summarize(avg= mean(life_expectancy,na.rm=TRUE))
-  
   country_tobe_replaced <- c("Bahamas", "Bolivia, Plurinational State of", "Brunei Darussalam", "Congo", "Côte d'Ivoire", "Czechia", "Democratic People's Republic of Korea", 
                              "Democratic Republic of the Congo, Republic of the", "Gambia", "Iran, Islamic Republic of", "Korea, Republic of", "Lao People's Democratic Republic", "Myanmar",
                              "North Macedonia", "Republic of Moldova", "Russian Federation", "Syrian Arab Republic", "United Kingdom of Great Britain and Northern Ireland",
