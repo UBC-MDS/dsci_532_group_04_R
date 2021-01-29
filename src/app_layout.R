@@ -230,7 +230,8 @@ function(year_range){
   fig <- fig %>% colorbar(title = 'Average Life Expectancy')
   fig <- fig %>% layout(
     title = 'Average Life Expectancy by Country',
-    geo = g
+    geo = g,
+    legend = list(font = list(size = 20))
   )
   fig
 }
