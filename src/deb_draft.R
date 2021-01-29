@@ -88,21 +88,72 @@ app$layout(
         )
       ),
       
-      # dbcRow(
-      #   htmlDiv(id = "widget_temp")
-      # ),
+
       
       dbcRow(
         dbcCol(
           dccGraph(id='widget_country_comparison')
         )
-      )
+      ),
       
-
+      dbcRow(
+        list(
+          dbcCol(
+            list(
+              htmlH5("Select X-Axis:"),
+              dccDropdown(
+                id = "widget_l_multi_dim_x_axis",
+                options = list(
+                  list(label = "Adult Mortality", value = "adult_mortality"),
+                  list(label = "Infant Deaths", value = "infant_deaths"),
+                  list(label = "Alcohol Consumption", value = "alcohol"),
+                  list(label = "Expenditure (%)", value = "percentage_expenditure"),
+                  list(label = "Hepatitis B", value = "hepatitis_B"),
+                  list(label = "Measles", value = "measles"),
+                  list(label = "BMI", value = "BMI"),
+                  list(label = "Deaths (below 5 yrs)", value = "under_five_deaths"),
+                  list(label = "Polio", value = "polio"),
+                  list(label = "Total Expenditure", value = "total_expenditure"),
+                  list(label = "Diphtheria", value = "diphtheria"),
+                  list(label = "HIV/Aids", value = "hiv_aids"),
+                  list(label = "GDP", value = "gdp"),
+                  list(label = "Population", value = "population"),
+                  list(label = "Schooling", value = "schooling")
+                ),
+                value = "adult_mortality"
+              )
+            ), style = list('max-width' = '50%')
+          ),
+          dbcCol(
+            list(
+              htmlHeader("Select Color Axis"),
+              dccRadioItems(
+                id = "widget_l_multi_dim_color_axis",
+                options = list(list(label = "Continent", value = "continent"),
+                               list(label = "Status", value = "status")
+                ),
+                value = 'continent'        
+              )              
+            )
+          )
+        )
+      ),
+      
+      # dbcRow(
+      #   htmlH1(id = "widget_temp", "BlaBla")
+      # ),      
+      
+      dbcRow(
+        dbcCol(
+          dccGraph(id='widget_o_multi_dim_analysis')
+        )
+      )
       
     ), style = list('max-width' = '85%')
   )
 )
+
+
 
 
 app$callback(
@@ -186,6 +237,51 @@ app$callback(
     
     
     ggplotly(plot_trend)
+  }
+)
+
+app$callback(
+  output("widget_o_multi_dim_analysis", "figure"),
+  list(
+    input("widget_g_year", "value"),
+    input("widget_l_multi_dim_x_axis", "value"),
+    input("widget_l_multi_dim_color_axis", "value")
+  ),
+  function(year_range,  x_axis, color_axis) {
+    
+    labels = list(
+      adult_mortality = "Adult Mortality",
+      infant_deaths = "Infant Deaths",
+      alcohol = "Alcohol Consumption",
+      percentage_expenditure = "Expenditure (%)",
+      hepatitis_B = "Hepatitis B",
+      measles = "Measles",
+      BMI = "BMI",
+      under_five_deaths = "Deaths (below 5 yrs)",
+      polio = "Polio",
+      total_expenditure = "Total Expenditure",
+      diphtheria = "Diphtheria",
+      hiv_aids = "HIV/Aids",
+      gdp = "GDP",
+      population = "Population",
+      schooling = "Schooling"
+    )
+    
+    #print(x_axis)
+    #print(labels[[x_axis]])
+    
+    chosen_ending_year = year_range[2]
+    
+    
+    plot_multi_dim <- dataset %>%
+      filter(year == chosen_ending_year) %>%
+      ggplot(aes(x=!!sym(x_axis), y=life_expectancy, color=!!sym(color_axis))) +
+      geom_point(size=3) +
+      labs(x=labels[[x_axis]], y="Life Expectancy", color="") +
+      theme_bw() +
+      ggthemes::scale_color_tableau()
+    
+    ggplotly(plot_multi_dim)
   }
 )
 
