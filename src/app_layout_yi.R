@@ -33,19 +33,18 @@ card <- dbcCard(
                            as.character(list(2000, 2005, 2010, 2015))),
           tooltip=list('always_visible' = TRUE, 'placement' = 'bottom')
         ) 
-      )
-    )),style=list("width" = "18rem", 'background-color'='#f8f9fa'))
+        )
+)),style=list("width" = "18rem", 'background-color'='#f8f9fa'))
 
 world_map = dbcCard(
     children = list(
       dbcCardHeader("Life Expectancy Snapshot", className="cursive",style=list('font-weight'='900')),
       dbcCardBody(
         children = list(
-          dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = 780, 'height' = 270)),
-          htmlP(id = "year_output")
+          dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = 800, 'height' = 270))
           )
         )
-      ), style = list('margin-left'="1em")
+      )
 )
 
 widget_style <- list('verticalAlign' = "bottom",'font-weight' = 'bold','font-size' = '12px')
@@ -55,8 +54,7 @@ dropdown_style <- list('verticalAlign' = "middle",
                        'border-radius' = '36px', 
                        'background-color'='#E8E8E8',
                        'display'='inline-block', 
-                       'width'="100%",
-                       'font-size' = '12px')
+                       'width'="100%")
 
 continent_widget <- htmlP('Select Continents:', className="card-text", style=widget_style)
 
@@ -88,11 +86,10 @@ trend_card <- dbcCard(
         dbcRow(children = list(dbcCol(continent_widget), dbcCol(continent_dropdown))),
         htmlBr(),
         dbcRow(children = list(dbcCol(status_widget), dbcCol(status_dropdown))),
-        htmlBr(),
         dccGraph(id="widget_o_year_wise_trend", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px'))
       )
     )
-  ), style = list("width"=550, "height"=600)
+  ), style = list("width"=250, "height"=380)
 )
 
 country_widget <- htmlP('Select a Country:', className="card-text", style=widget_style)
@@ -114,11 +111,10 @@ comparison_card <- dbcCard(
         dbcRow(list(dbcCol(country_widget), dbcCol(country_dropdown))),
         htmlBr(),
         htmlBr(),
-        htmlBr(),
         dccGraph(id="widget_country_comparison", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px'))
       )
     )
-  ), style = list("width"=550, "height"=600)
+  ), style = list("width"=250, "height"=380)
 )
 
 axis_widget <- htmlP('Select X-Axis:', className="card-text", style=widget_style)
@@ -187,13 +183,14 @@ app$callback(
 function(year_range){
   chosen_starting_year = year_range[1]
   chosen_ending_year = year_range[2]
-  
-  df <- read.csv('data/raw/2014_world_gdp.csv')
+  df <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
   
   # Compute the mean of life expectancy
   # Make a copy of the dataset
   data<- data.frame(dataset)
+    
   data_mean<- data %>% filter(year>={{chosen_starting_year}}, year<={{chosen_ending_year}}) %>% group_by(country) %>% summarize(avg= mean(life_expectancy,na.rm=TRUE))
+  
   country_tobe_replaced <- c("Bahamas", "Bolivia, Plurinational State of", "Brunei Darussalam", "Congo", "Côte d'Ivoire", "Czechia", "Democratic People's Republic of Korea", 
                              "Democratic Republic of the Congo, Republic of the", "Gambia", "Iran, Islamic Republic of", "Korea, Republic of", "Lao People's Democratic Republic", "Myanmar",
                              "North Macedonia", "Republic of Moldova", "Russian Federation", "Syrian Arab Republic", "United Kingdom of Great Britain and Northern Ireland",
@@ -242,16 +239,7 @@ function(year_range){
 }
 )
 
-app$callback(
-  output("year_output","children"),
-  list(input("widget_g_year","value")),
-  function(year_range){
-    chosen_starting_year = year_range[1]
-    chosen_ending_year = year_range[2]
-    return(paste0("* The data shown in the tooltip is the average life expectancy for the selected country between ", chosen_starting_year, " and ", chosen_ending_year, " ."))
- 
-  }
-)
+
 
 app$callback(
   output("widget_o_year_wise_trend", "figure"),
@@ -276,18 +264,12 @@ app$callback(
       ggplot(aes(x=year, y=life_expectancy, color=!!sym(color_axis))) +
       geom_line(stat = "summary", fun=mean) +
       labs(x="Year", y="Life Expectancy (Mean)", color="") +
-      scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
       theme(legend.position="bottom") +
       theme_bw() +
-      ggthemes::scale_color_tableau()  
+      ggthemes::scale_color_tableau() 
     
     
-    ggplotly(plot_trend) %>% 
-      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
-             xaxis = list(title = list(font = list(size = 12)),
-                          tickfont = list(size = 10)),
-             yaxis = list(title = list(font = list(size = 12)),
-                          tickfont = list(size = 10)))
+    ggplotly(plot_trend) %>% layout(legend = list(orientation = "h", x = 0.05, y = -0.2))
   }
 )
 
@@ -335,18 +317,12 @@ app$callback(
       ggplot(aes(x=year, y=mean_life_exp, color=label)) +
       geom_line(stat = "summary", fun=mean) +
       labs(x="Year", y="Life Expectancy (Mean)", color="") +
-      scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
       theme_bw() +
       ggthemes::scale_color_tableau() +
       theme(legend.position="bottom")
     
     
-    ggplotly(plot_trend) %>% 
-      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
-             xaxis = list(title = list(font = list(size = 12)),
-                          tickfont = list(size = 10)),
-             yaxis = list(title = list(font = list(size = 12)),
-                          tickfont = list(size = 10)))
+    ggplotly(plot_trend) %>% layout(legend = list(orientation = "h", x = 0.05, y = -0.2))
   }
 )
 
@@ -386,18 +362,13 @@ app$callback(
     plot_multi_dim <- dataset %>%
       filter(year == chosen_ending_year) %>%
       ggplot(aes(x=!!sym(x_axis), y=life_expectancy, color=!!sym(color_axis))) +
-      geom_point(size=2) +
+      geom_point(size=3) +
       labs(x=labels[[x_axis]], y="Life Expectancy", color="") +
       theme_bw() +
       ggthemes::scale_color_tableau() +
       theme(legend.position="bottom")
     
-    ggplotly(plot_multi_dim) %>% 
-      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
-             xaxis = list(title = list(font = list(size = 12)),
-                          tickfont = list(size = 10)),
-             yaxis = list(title = list(font = list(size = 12)),
-                          tickfont = list(size = 10)))
+    ggplotly(plot_multi_dim) %>% layout(legend = list(orientation = "h", x = 0.05, y = -0.2))
   }
 )
 
