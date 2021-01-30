@@ -3,7 +3,7 @@ Life Expectancy Indicator
 MDS DSCI 532 Group 04
 
 ## Heroku 
-[Life Expectancy](https://life-expectancy-indicator.herokuapp.com/)
+[Life Expectancy](https://life-expectancy-indicator-r.herokuapp.com/)
 
 ## App Description
 
