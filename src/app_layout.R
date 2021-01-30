@@ -41,7 +41,8 @@ world_map = dbcCard(
       dbcCardHeader("Life Expectancy Snapshot", className="cursive",style=list('font-weight'='900')),
       dbcCardBody(
         children = list(
-          dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = 780, 'height' = 270))
+          dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = 780, 'height' = 270)),
+          htmlP(id = "year_output")
           )
         )
       ), style = list('margin-left'="1em")
@@ -241,7 +242,16 @@ function(year_range){
 }
 )
 
-
+app$callback(
+  output("year_output","children"),
+  list(input("widget_g_year","value")),
+  function(year_range){
+    chosen_starting_year = year_range[1]
+    chosen_ending_year = year_range[2]
+    return(paste0("* The data shown in the tooltip is the average life expectancy for the selected country between ", chosen_starting_year, " and ", chosen_ending_year, " ."))
+ 
+  }
+)
 
 app$callback(
   output("widget_o_year_wise_trend", "figure"),
@@ -266,13 +276,14 @@ app$callback(
       ggplot(aes(x=year, y=life_expectancy, color=!!sym(color_axis))) +
       geom_line(stat = "summary", fun=mean) +
       labs(x="Year", y="Life Expectancy (Mean)", color="") +
+      scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
       theme(legend.position="bottom") +
       theme_bw() +
       ggthemes::scale_color_tableau()  
     
     
     ggplotly(plot_trend) %>% 
-      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 12))),
+      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)),
              yaxis = list(title = list(font = list(size = 12)),
@@ -324,13 +335,14 @@ app$callback(
       ggplot(aes(x=year, y=mean_life_exp, color=label)) +
       geom_line(stat = "summary", fun=mean) +
       labs(x="Year", y="Life Expectancy (Mean)", color="") +
+      scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
       theme_bw() +
       ggthemes::scale_color_tableau() +
       theme(legend.position="bottom")
     
     
     ggplotly(plot_trend) %>% 
-      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 12))),
+      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)),
              yaxis = list(title = list(font = list(size = 12)),
@@ -381,7 +393,7 @@ app$callback(
       theme(legend.position="bottom")
     
     ggplotly(plot_multi_dim) %>% 
-      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 12))),
+      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)),
              yaxis = list(title = list(font = list(size = 12)),
