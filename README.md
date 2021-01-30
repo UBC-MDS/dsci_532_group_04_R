@@ -29,8 +29,7 @@ The proposal document could be found
 
 <img src="figures/labelled_sketch.png" width="6526" />
 
+
 ## Dashboard Overview
 
-<img src="figures/web_capture.png" width="6526" />
-
-
+<img src="figures/web_capture.jpeg" width="6526" />
