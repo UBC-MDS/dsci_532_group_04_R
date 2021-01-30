@@ -28,3 +28,9 @@ The proposal document could be found
 ## App Sketch
 
 <img src="figures/labelled_sketch.png" width="6526" />
+
+## Dashboard Overview
+
+<img src="figures/web_capture.png" width="6526" />
+
+
