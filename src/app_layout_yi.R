@@ -33,18 +33,19 @@ card <- dbcCard(
                            as.character(list(2000, 2005, 2010, 2015))),
           tooltip=list('always_visible' = TRUE, 'placement' = 'bottom')
         ) 
-        )
-)),style=list("width" = "18rem", 'background-color'='#f8f9fa'))
+      )
+    )),style=list("width" = "18rem", 'background-color'='#f8f9fa'))
 
 world_map = dbcCard(
-    children = list(
-      dbcCardHeader("Life Expectancy Snapshot", className="cursive",style=list('font-weight'='900')),
-      dbcCardBody(
-        children = list(
-          dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = 800, 'height' = 270))
-          )
-        )
+  children = list(
+    dbcCardHeader("Life Expectancy Snapshot", className="cursive",style=list('font-weight'='900')),
+    dbcCardBody(
+      children = list(
+        dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = 780, 'height' = 270)),
+        htmlP(id = "year_output")
       )
+    )
+  ), style = list('margin-left'="1em")
 )
 
 widget_style <- list('verticalAlign' = "bottom",'font-weight' = 'bold','font-size' = '12px')
@@ -54,7 +55,8 @@ dropdown_style <- list('verticalAlign' = "middle",
                        'border-radius' = '36px', 
                        'background-color'='#E8E8E8',
                        'display'='inline-block', 
-                       'width'="100%")
+                       'width'="100%",
+                       'font-size' = '12px')
 
 continent_widget <- htmlP('Select Continents:', className="card-text", style=widget_style)
 
@@ -86,10 +88,11 @@ trend_card <- dbcCard(
         dbcRow(children = list(dbcCol(continent_widget), dbcCol(continent_dropdown))),
         htmlBr(),
         dbcRow(children = list(dbcCol(status_widget), dbcCol(status_dropdown))),
+        htmlBr(),
         dccGraph(id="widget_o_year_wise_trend", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px'))
       )
     )
-  ), style = list("width"=250, "height"=380)
+  ), style = list("width"=350, "height"=600)
 )
 
 country_widget <- htmlP('Select a Country:', className="card-text", style=widget_style)
@@ -111,10 +114,11 @@ comparison_card <- dbcCard(
         dbcRow(list(dbcCol(country_widget), dbcCol(country_dropdown))),
         htmlBr(),
         htmlBr(),
+        htmlBr(),
         dccGraph(id="widget_country_comparison", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px'))
       )
     )
-  ), style = list("width"=250, "height"=380)
+  ), style = list("width"=350, "height"=600)
 )
 
 axis_widget <- htmlP('Select X-Axis:', className="card-text", style=widget_style)
@@ -165,7 +169,7 @@ effect_card <- dbcCard(
         dccGraph(id="widget_o_multi_dim_analysis", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px'))
       )
     )
-  )
+  ), style = list("width"=350, "height"=600), # color="light", outline=TRUE
 )
 
 
@@ -173,73 +177,84 @@ app$layout(dbcContainer(
   children = list(
     dbcRow(list(card, world_map)),
     htmlBr(),
-    dbcCardDeck(list(trend_card, comparison_card, effect_card))
+    dbcRow(list(dbcCol(trend_card, style=list('margin-right' = '5px', 'margin-left' ='5px')), 
+                dbcCol(comparison_card, style=list('margin-right' = '5px', 'margin-left' ='5px')), 
+                dbcCol(effect_card, style=list('margin-right' = '5px', 'margin-left' ='5px'))), 
+           no_gutters=TRUE)
   )
 ))
 
 app$callback(
   output("map_graph","figure"),
   list(input("widget_g_year","value")),
-function(year_range){
-  chosen_starting_year = year_range[1]
-  chosen_ending_year = year_range[2]
-  df <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
-  
-  # Compute the mean of life expectancy
-  # Make a copy of the dataset
-  data<- data.frame(dataset)
+  function(year_range){
+    chosen_starting_year = year_range[1]
+    chosen_ending_year = year_range[2]
     
-  data_mean<- data %>% filter(year>={{chosen_starting_year}}, year<={{chosen_ending_year}}) %>% group_by(country) %>% summarize(avg= mean(life_expectancy,na.rm=TRUE))
-  
-  country_tobe_replaced <- c("Bahamas", "Bolivia, Plurinational State of", "Brunei Darussalam", "Congo", "Côte d'Ivoire", "Czechia", "Democratic People's Republic of Korea", 
-                             "Democratic Republic of the Congo, Republic of the", "Gambia", "Iran, Islamic Republic of", "Korea, Republic of", "Lao People's Democratic Republic", "Myanmar",
-                             "North Macedonia", "Republic of Moldova", "Russian Federation", "Syrian Arab Republic", "United Kingdom of Great Britain and Northern Ireland",
-                             "United Republic of Tanzania", "United States of America", "Venezuela, Bolivarian Republic of", "Viet Nam" )
-  country_replaced <- c("Bahamas, The", "Bolivia", "Brunei", "Congo, Republic of the", "Cote d'Ivoire", "Czech Republic", "Korea, North", 
-                        "Congo, Democratic Republic of the", "Gambia, The", "Iran", "Korea, South", "Laos", "Burma", 
-                        "Macedonia", "Moldova", "Russia" , "Syria", "United Kingdom",
-                        "Tanzania", "United States", "Venezuela", "Vietnam")
-  
-  for (i in 1:length(country_tobe_replaced)){
-    data_mean$country= gsub(country_tobe_replaced[i], country_replaced[i], data_mean$country)
-    data$country= gsub(country_tobe_replaced[i], country_replaced[i], data$country)
+    df <- read.csv('data/raw/2014_world_gdp.csv')
+    
+    # Compute the mean of life expectancy
+    # Make a copy of the dataset
+    data<- data.frame(dataset)
+    data_mean<- data %>% filter(year>={{chosen_starting_year}}, year<={{chosen_ending_year}}) %>% group_by(country) %>% summarize(avg= mean(life_expectancy,na.rm=TRUE))
+    country_tobe_replaced <- c("Bahamas", "Bolivia, Plurinational State of", "Brunei Darussalam", "Congo", "Côte d'Ivoire", "Czechia", "Democratic People's Republic of Korea", 
+                               "Democratic Republic of the Congo, Republic of the", "Gambia", "Iran, Islamic Republic of", "Korea, Republic of", "Lao People's Democratic Republic", "Myanmar",
+                               "North Macedonia", "Republic of Moldova", "Russian Federation", "Syrian Arab Republic", "United Kingdom of Great Britain and Northern Ireland",
+                               "United Republic of Tanzania", "United States of America", "Venezuela, Bolivarian Republic of", "Viet Nam" )
+    country_replaced <- c("Bahamas, The", "Bolivia", "Brunei", "Congo, Republic of the", "Cote d'Ivoire", "Czech Republic", "Korea, North", 
+                          "Congo, Democratic Republic of the", "Gambia, The", "Iran", "Korea, South", "Laos", "Burma", 
+                          "Macedonia", "Moldova", "Russia" , "Syria", "United Kingdom",
+                          "Tanzania", "United States", "Venezuela", "Vietnam")
+    
+    for (i in 1:length(country_tobe_replaced)){
+      data_mean$country= gsub(country_tobe_replaced[i], country_replaced[i], data_mean$country)
+      data$country= gsub(country_tobe_replaced[i], country_replaced[i], data$country)
+    }
+    
+    data_mean <- merge(x = data_mean, y = df[,c("COUNTRY","CODE")], by.x = "country", by.y= "COUNTRY" , all.x = TRUE )
+    
+    # to check
+    #data_mean %>%  filter(is.na(CODE))
+    # Left join country with code
+    data <- merge(x = data, y = data_mean, by = "country", all.x = TRUE)
+    
+    # light grey boundaries
+    l <- list(color = toRGB("grey"), width = 0.5)
+    
+    # specify map projection/options
+    g <- list(
+      showframe = FALSE,
+      showcoastlines = FALSE,
+      projection = list(type = 'Mercator')
+    )
+    
+    fig <- plot_geo(data)
+    
+    fig <- fig %>% add_trace(
+      z = ~avg, color = ~avg, colors = 'Blues',
+      text = ~country, locations = ~CODE, marker = list(line = l)
+    )
+    
+    fig <- fig %>% colorbar(title = 'Average Life Expectancy')
+    fig <- fig %>% layout(
+      title = 'Average Life Expectancy by Country',
+      geo = g,
+      legend = list(font = list(size = 20))
+    )
+    fig
   }
-  
-  data_mean <- merge(x = data_mean, y = df[,c("COUNTRY","CODE")], by.x = "country", by.y= "COUNTRY" , all.x = TRUE )
-  
-  # to check
-  #data_mean %>%  filter(is.na(CODE))
-  # Left join country with code
-  data <- merge(x = data, y = data_mean, by = "country", all.x = TRUE)
-  
-  # light grey boundaries
-  l <- list(color = toRGB("grey"), width = 0.5)
-  
-  # specify map projection/options
-  g <- list(
-    showframe = FALSE,
-    showcoastlines = FALSE,
-    projection = list(type = 'Mercator')
-  )
-  
-  fig <- plot_geo(data)
-  
-  fig <- fig %>% add_trace(
-    z = ~avg, color = ~avg, colors = 'Blues',
-    text = ~country, locations = ~CODE, marker = list(line = l)
-  )
-  
-  fig <- fig %>% colorbar(title = 'Average Life Expectancy')
-  fig <- fig %>% layout(
-    title = 'Average Life Expectancy by Country',
-    geo = g,
-    legend = list(font = list(size = 20))
-  )
-  fig
-}
 )
 
-
+app$callback(
+  output("year_output","children"),
+  list(input("widget_g_year","value")),
+  function(year_range){
+    chosen_starting_year = year_range[1]
+    chosen_ending_year = year_range[2]
+    return(paste0("* The data shown in the tooltip is the average life expectancy for the selected country between ", chosen_starting_year, " and ", chosen_ending_year, " ."))
+    
+  }
+)
 
 app$callback(
   output("widget_o_year_wise_trend", "figure"),
@@ -264,12 +279,18 @@ app$callback(
       ggplot(aes(x=year, y=life_expectancy, color=!!sym(color_axis))) +
       geom_line(stat = "summary", fun=mean) +
       labs(x="Year", y="Life Expectancy (Mean)", color="") +
+      scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
       theme(legend.position="bottom") +
       theme_bw() +
-      ggthemes::scale_color_tableau() 
+      ggthemes::scale_color_tableau()  
     
     
-    ggplotly(plot_trend) %>% layout(legend = list(orientation = "h", x = 0.05, y = -0.2))
+    ggplotly(plot_trend) %>% 
+      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
+             xaxis = list(title = list(font = list(size = 12)),
+                          tickfont = list(size = 10)),
+             yaxis = list(title = list(font = list(size = 12)),
+                          tickfont = list(size = 10)))
   }
 )
 
@@ -317,12 +338,18 @@ app$callback(
       ggplot(aes(x=year, y=mean_life_exp, color=label)) +
       geom_line(stat = "summary", fun=mean) +
       labs(x="Year", y="Life Expectancy (Mean)", color="") +
+      scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
       theme_bw() +
       ggthemes::scale_color_tableau() +
       theme(legend.position="bottom")
     
     
-    ggplotly(plot_trend) %>% layout(legend = list(orientation = "h", x = 0.05, y = -0.2))
+    ggplotly(plot_trend) %>% 
+      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
+             xaxis = list(title = list(font = list(size = 12)),
+                          tickfont = list(size = 10)),
+             yaxis = list(title = list(font = list(size = 12)),
+                          tickfont = list(size = 10)))
   }
 )
 
@@ -362,13 +389,18 @@ app$callback(
     plot_multi_dim <- dataset %>%
       filter(year == chosen_ending_year) %>%
       ggplot(aes(x=!!sym(x_axis), y=life_expectancy, color=!!sym(color_axis))) +
-      geom_point(size=3) +
+      geom_point(size=2) +
       labs(x=labels[[x_axis]], y="Life Expectancy", color="") +
       theme_bw() +
       ggthemes::scale_color_tableau() +
       theme(legend.position="bottom")
     
-    ggplotly(plot_multi_dim) %>% layout(legend = list(orientation = "h", x = 0.05, y = -0.2))
+    ggplotly(plot_multi_dim) %>% 
+      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
+             xaxis = list(title = list(font = list(size = 12)),
+                          tickfont = list(size = 10)),
+             yaxis = list(title = list(font = list(size = 12)),
+                          tickfont = list(size = 10)))
   }
 )
 
