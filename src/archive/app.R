@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 library(dash)
 library(dashHtmlComponents)
 library(tidyverse)
@@ -21,7 +22,6 @@ card <- dbcCard(
         htmlH2("Expectancy", className="display-6"),
         htmlH2("Indicator", className="display-6"),
         htmlHr(),
-        htmlBr(),
         dbcLabel("Year Range"),
         dccRangeSlider(
           id = 'widget_g_year',
@@ -29,20 +29,21 @@ card <- dbcCard(
           max = 2015,
           step = 1,
           value = list(2000, 2015),
-          marks = setNames(lapply(list(2000, 2003, 2006, 2009, 2012, 2015), 
+          marks = setNames(lapply(list(2000, 2005, 2010, 2015), 
                                   function(x) paste(x)), 
-                           as.character(list(2000, 2003, 2006, 2009, 2012, 2015))),
+                           as.character(list(2000, 2005, 2010, 2015))),
           tooltip=list('always_visible' = TRUE, 'placement' = 'bottom')
         ) 
       )
-    )),style=list("width" = "23rem", 'background-color'='#f8f9fa'))
+    )),style=list("width" = "18rem", 'background-color'='#f8f9fa'))
 
 world_map = dbcCard(
     children = list(
       dbcCardHeader("Life Expectancy Snapshot", className="cursive",style=list('font-weight'='900')),
       dbcCardBody(
         children = list(
-          dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = "44.5rem", 'height' = 270))
+          dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = 780, 'height' = 270)),
+          htmlP(id = "year_output")
           )
         )
       ), style = list('margin-left'="1em")
@@ -92,7 +93,7 @@ trend_card <- dbcCard(
         dccGraph(id="widget_o_year_wise_trend", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px'))
       )
     )
-  ), style = list("width"="23rem", "height"=640)
+  ), style = list("width"=550, "height"=600)
 )
 
 country_widget <- htmlP('Select a Country:', className="card-text", style=widget_style)
@@ -118,7 +119,7 @@ comparison_card <- dbcCard(
         dccGraph(id="widget_country_comparison", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px'))
       )
     )
-  ), style = list("width"="23rem", "height"=640, 'margin-left'="1em")
+  ), style = list("width"=550, "height"=600)
 )
 
 axis_widget <- htmlP('Select X-Axis:', className="card-text", style=widget_style)
@@ -166,11 +167,10 @@ effect_card <- dbcCard(
         htmlBr(),
         dbcRow(list(dbcCol(color_widget), dbcCol(color_dropdown))),
         htmlBr(),
-        dccGraph(id="widget_o_multi_dim_analysis", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px')),
-        htmlP(id = "scatter_output", style = list('font-size' = '12px'))
+        dccGraph(id="widget_o_multi_dim_analysis", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px'))
       )
     )
-  ), style = list("width"="23rem", "height"=640, 'margin-left'="1em")
+  )
 )
 
 
@@ -178,7 +178,7 @@ app$layout(dbcContainer(
   children = list(
     dbcRow(list(card, world_map)),
     htmlBr(),
-    dbcRow(list(trend_card, comparison_card, effect_card))
+    dbcCardDeck(list(trend_card, comparison_card, effect_card))
   )
 ))
 
@@ -243,6 +243,16 @@ function(year_range){
 }
 )
 
+app$callback(
+  output("year_output","children"),
+  list(input("widget_g_year","value")),
+  function(year_range){
+    chosen_starting_year = year_range[1]
+    chosen_ending_year = year_range[2]
+    return(paste0("* The data shown in the tooltip is the average life expectancy for the selected country between ", chosen_starting_year, " and ", chosen_ending_year, " ."))
+ 
+  }
+)
 
 app$callback(
   output("widget_o_year_wise_trend", "figure"),
@@ -274,8 +284,7 @@ app$callback(
     
     
     ggplotly(plot_trend) %>% 
-      layout(autosize = F, width = 320, height = 400,
-             legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
+      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)),
              yaxis = list(title = list(font = list(size = 12)),
@@ -334,8 +343,7 @@ app$callback(
     
     
     ggplotly(plot_trend) %>% 
-      layout(autosize = F, width = 330, height = 380,
-             legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
+      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)),
              yaxis = list(title = list(font = list(size = 12)),
@@ -370,6 +378,9 @@ app$callback(
       schooling = "Schooling"
     )
     
+    #print(x_axis)
+    #print(labels[[x_axis]])
+    
     chosen_ending_year = year_range[2]
     
     
@@ -383,24 +394,13 @@ app$callback(
       theme(legend.position="bottom")
     
     ggplotly(plot_multi_dim) %>% 
-      layout(autosize = F, width = 320, height = 400,
-             legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
+      layout(legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)),
              yaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)))
   }
-  
 )
 
-app$callback(
-  output("scatter_output","children"),
-  list(input("widget_g_year","value")),
-  function(year_range){
-    chosen_ending_year = year_range[2]
-    return(paste0("* The data shown above is for the year of ", chosen_ending_year, " ."))
-    
-  }
-)
+app$run_server(host = '0.0.0.0', port = Sys.getenv('PORT', 8050))
 
-app$run_server(debug = T)
