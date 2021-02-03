@@ -128,19 +128,20 @@ axis_dropdown <- dccDropdown(
   options = list(
     list(label = "Adult Mortality", value = "adult_mortality"),
     list(label = "Infant Deaths", value = "infant_deaths"),
-    list(label = "Alcohol Consumption", value = "alcohol"),
-    list(label = "Expenditure (%)", value = "percentage_expenditure"),
+    # list(label = "Alcohol Consumption", value = "alcohol"),
+    # list(label = "Expenditure (%)", value = "percentage_expenditure"),
     list(label = "Hepatitis B", value = "hepatitis_B"),
     list(label = "Measles", value = "measles"),
     list(label = "BMI", value = "BMI"),
     list(label = "Deaths (below 5 yrs)", value = "under_five_deaths"),
     list(label = "Polio", value = "polio"),
-    list(label = "Total Expenditure", value = "total_expenditure"),
+    # list(label = "Total Expenditure", value = "total_expenditure"),
     list(label = "Diphtheria", value = "diphtheria"),
     list(label = "HIV/Aids", value = "hiv_aids"),
     list(label = "GDP", value = "gdp"),
     list(label = "Population", value = "population"),
-    list(label = "Schooling", value = "schooling")),
+    list(label = "Schooling", value = "schooling"),
+    list(label = "Income Composition", value = "income_composition_of_resources")),
   value = "adult_mortality",
   clearable = FALSE,
   style = dropdown_style
@@ -353,42 +354,58 @@ app$callback(
   function(year_range,  x_axis, color_axis) {
     
     labels = list(
-      adult_mortality = "Adult Mortality",
-      infant_deaths = "Infant Deaths",
-      alcohol = "Alcohol Consumption",
-      percentage_expenditure = "Expenditure (%)",
-      hepatitis_B = "Hepatitis B",
-      measles = "Measles",
-      BMI = "BMI",
-      under_five_deaths = "Deaths (below 5 yrs)",
-      polio = "Polio",
-      total_expenditure = "Total Expenditure",
-      diphtheria = "Diphtheria",
-      hiv_aids = "HIV/Aids",
-      gdp = "GDP",
+      adult_mortality = "Adult Mortality (per 1000 population)",
+      infant_deaths = "Infant Deaths (per 1000 population)",
+      # alcohol = "Alcohol Consumption (per capita)",
+      # percentage_expenditure = "Expenditure (%)",
+      hepatitis_B = "% Hepatitis B immunization \n within first year year",
+      measles = "Measles reported  (per 1000 population)",
+      BMI = "Avg. Body Mass Index",
+      under_five_deaths = "# of Deaths (below 5 yrs)",
+      polio = "% Polio immunization \n within first year year",
+      # total_expenditure = "Total Expenditure",
+      diphtheria = "% Diphtheria immunization \n within first year year",
+      hiv_aids = "Deaths per 1000 live births HIV/AIDS \n (0-4 years)",
+      gdp = "GDP per capita (in USD)",
       population = "Population",
-      schooling = "Schooling"
+      schooling = "# of Schooling years",
+      income_composition_of_resources = "Human Development Index (0 to 1)"
     )
+    
+    #print(x_axis)
+    #print(labels[[x_axis]])
     
     chosen_ending_year = year_range[2]
     
+    
+    na_count <- sum(is.na(dataset %>%
+                            filter(year == chosen_ending_year) %>%
+                            select(!!sym(x_axis)) %>%
+                            pull()))
+    
+    if (na_count >= 1){
+      disclaimer1 = paste0("**Data missing for ", na_count," countries")
+    } else {
+      disclaimer1 <- ""
+    }
     
     plot_multi_dim <- dataset %>%
       filter(year == chosen_ending_year) %>%
       ggplot(aes(x=!!sym(x_axis), y=life_expectancy, color=!!sym(color_axis))) +
       geom_point(size=2) +
-      labs(x=labels[[x_axis]], y="Life Expectancy", color="") +
+      labs(x=labels[[x_axis]], y="Life Expectancy", color="", title = disclaimer1) +
       theme_bw() +
       ggthemes::scale_color_tableau() +
       theme(legend.position="bottom")
     
     ggplotly(plot_multi_dim) %>% 
       layout(autosize = F, width = 320, height = 400,
-             legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
+             legend = list(orientation = "h", x = 0.05, y = -0.4, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)),
              yaxis = list(title = list(font = list(size = 12)),
-                          tickfont = list(size = 10)))
+                          tickfont = list(size = 10)),
+             title = list(font = list(size = 12)))
   }
   
 )
