@@ -11,7 +11,7 @@ library(plotly)
 dataset <- read_csv("data/processed/life_expectancy_data_processed.csv")
 
 
-app = Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
+app = Dash$new(name='Life Expectancy', external_stylesheets = dbcThemes$BOOTSTRAP)
 
 card <- dbcCard(
   children = list(
