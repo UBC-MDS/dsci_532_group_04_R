@@ -24,4 +24,4 @@ The proposal document could be found
 
 ## Dashboard Overview
 
-<img src="figures/web_capture.jpeg" width="6526" />
+<img src="figures/app.gif" width="6526" />
