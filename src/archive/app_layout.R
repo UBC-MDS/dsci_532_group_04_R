@@ -13,6 +13,8 @@ dataset <- read_csv("data/processed/life_expectancy_data_processed.csv")
 
 app = Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 
+app$title("Life Expectancy Indicator")
+
 card <- dbcCard(
   children = list(
     dbcCardBody(
