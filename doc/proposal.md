@@ -1,6 +1,6 @@
 Proposal
 ================
-MDS DSCI 523 Group 04
+Authors: Debananda Sarkar, Zhanyi Su, Junting He, Joshua Lim
 
 -   [Section 1: Motivation and
     Purpose](#section-1-motivation-and-purpose)
