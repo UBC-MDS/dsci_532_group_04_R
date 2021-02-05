@@ -19,7 +19,7 @@ perform multi-dimensional analysis to understand factors affecting life
 expectancy. 
 
 The proposal document could be found
-[here](https://github.com/UBC-MDS/dsci_532_group_04/blob/main/docs/proposal.md).
+[here](https://github.com/UBC-MDS/dsci_532_group_04_R/blob/main/doc/proposal.md).
 
 
 ## Dashboard Overview
