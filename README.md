@@ -2,7 +2,7 @@ Life Expectancy Indicator
 ================
 Authors: Debananda Sarkar, Zhanyi Su, Junting He, Joshua Lim
 
-## App Linke
+## App Link
 [Life Expectancy](https://life-expectancy-indicator-r.herokuapp.com/)
 
 ## App Description
