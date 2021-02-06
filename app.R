@@ -249,11 +249,11 @@ app$callback(
       b = 0,
       t = 0
     )
-    fig <- fig %>% colorbar(title = "")
+    fig <- fig %>% colorbar(title = "", limits=c(45,80))
     fig <- fig %>% layout(
       autosize = F, width = 700, height = 290, margin = m,
-      geo = g,
-      legend = list(font = list(size = 20)) 
+      geo = g
+      #legend = list(font = list(size = 20)) 
     )
     fig
   }
