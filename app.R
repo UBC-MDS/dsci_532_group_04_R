@@ -201,14 +201,20 @@ app$layout(dbcContainer(
 app$callback(
   output("map_graph","figure"),
   list(input("widget_g_year","value")),
+  
+#' Creating Life Expectancy World Map based on the mean of the grouped countries
+#'
+#' @param year_range the selected year range
+#'
+#' @return a world map displaying the mean of life expectancy for countries within the selected year range
+#'
+#' @examples
   function(year_range){
+    
     chosen_starting_year = year_range[1]
     chosen_ending_year = year_range[2]
     
     df <- read.csv('data/raw/2014_world_gdp.csv')
-    
-    # Compute the mean of life expectancy
-    # Make a copy of the dataset
     data<- data.frame(dataset)
     data_mean<- data %>% filter(year>={{chosen_starting_year}}, year<={{chosen_ending_year}}) %>% group_by(country) %>% summarize(avg= mean(life_expectancy,na.rm=TRUE))
     country_tobe_replaced <- c("Bahamas", "Bolivia, Plurinational State of", "Brunei Darussalam", "Congo", "Côte d'Ivoire", "Czechia", "Democratic People's Republic of Korea", 
@@ -224,36 +230,30 @@ app$callback(
       data_mean$country= gsub(country_tobe_replaced[i], country_replaced[i], data_mean$country)
       data$country= gsub(country_tobe_replaced[i], country_replaced[i], data$country)
     }
-    
     data_mean <- merge(x = data_mean, y = df[,c("COUNTRY","CODE")], by.x = "country", by.y= "COUNTRY" , all.x = TRUE )
-    
-    # to check
-    #data_mean %>%  filter(is.na(CODE))
-    # Left join country with code
-    data <- merge(x = data, y = data_mean, by = "country", all.x = TRUE)
-    
-    # light grey boundaries
-    l <- list(color = toRGB("grey"), width = 0.5)
-    
-    # specify map projection/options
-    g <- list(
+    data <- merge(x = data, y = data_mean, by = "country", all.x = TRUE) # Left join country with code
+    l <- list(color = toRGB("grey"), width = 0.5)    # light grey boundaries
+    g <- list(   # specify map projection/options
       showframe = FALSE,
       showcoastlines = FALSE,
       projection = list(type = 'Mercator')
     )
-    
     fig <- plot_geo(data)
-    
     fig <- fig %>% add_trace(
       z = ~avg, color = ~avg, colors = 'Blues',
       text = ~country, locations = ~CODE, marker = list(line = l)
     )
-    
-    fig <- fig %>% colorbar(title = 'Average Life Expectancy')
+    m <- list(
+      l = 50,
+      r = 50,
+      b = 0,
+      t = 0
+    )
+    fig <- fig %>% colorbar(title = "")
     fig <- fig %>% layout(
-      title = 'Average Life Expectancy by Country',
+      autosize = F, width = 700, height = 290, margin = m,
       geo = g,
-      legend = list(font = list(size = 20))
+      legend = list(font = list(size = 20)) 
     )
     fig
   }
