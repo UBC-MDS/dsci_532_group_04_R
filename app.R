@@ -428,8 +428,8 @@ app$callback(
     plot_multi_dim <- dataset %>%
       filter(year >= chosen_starting_year, year <= chosen_ending_year) %>%
       group_by(!!sym(color_axis), country) %>%
-      summarise(avg_x_axis = mean(!!sym(x_axis)),
-                `Avg. Life Expectancy` = round(mean(life_expectancy), 2)) %>%
+      summarise(avg_x_axis = mean(!!sym(x_axis), na.rm = TRUE),
+                `Avg. Life Expectancy` = round(mean(life_expectancy, na.rm = TRUE), 2)) %>%
       mutate(Country = country) %>%
       ggplot(aes(x=avg_x_axis, y=`Avg. Life Expectancy`, color=!!sym(color_axis), label=Country)) +
       geom_point(size=2) +
