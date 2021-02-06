@@ -12,7 +12,9 @@ library(plotly)
 dataset <- read_csv("data/processed/life_expectancy_data_processed.csv")
 
 
-app = Dash$new(name='Life Expectancy', external_stylesheets = dbcThemes$BOOTSTRAP)
+app = Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
+
+app$title("newTitle")
 
 card <- dbcCard(
   children = list(
@@ -178,9 +180,21 @@ effect_card <- dbcCard(
 
 app$layout(dbcContainer(
   children = list(
+    htmlBr(),
     dbcRow(list(card, world_map)),
     htmlBr(),
-    dbcRow(list(trend_card, comparison_card, effect_card))
+    dbcRow(list(trend_card, comparison_card, effect_card)),
+    htmlBr(),
+    htmlHr(),
+    dccMarkdown("This app was made by [Debananda Sarkar](https://github.com/debanandasarkar), 
+    [Zhanyi Su](https://github.com/YikiSu), 
+    [Junting He](https://github.com/JuntingHe), 
+    [Joshua Lim](https://github.com/jiajie0225) 
+    using [data](https://github.com/UBC-MDS/dsci_532_group_04_R/blob/main/data/processed/life_expectancy_data_processed.csv) 
+    compiled from a [Kaggle dataset](https://www.kaggle.com/kumarajarshi/life-expectancy-who).
+    The app follows [MIT's license](https://github.com/UBC-MDS/dsci_532_group_04_R/blob/main/LICENSE) and 
+    the source code can be found on [GitHub](https://github.com/UBC-MDS/dsci_532_group_04_R)."),
+    htmlP(paste0("Data was last updated on ", format(Sys.time(), '%d %B, %Y'), " ."))
   )
 ))
 
