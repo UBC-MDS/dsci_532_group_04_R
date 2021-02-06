@@ -170,7 +170,7 @@ effect_card <- dbcCard(
         htmlBr(),
         dbcRow(list(dbcCol(color_widget), dbcCol(color_dropdown))),
         htmlBr(),
-        dccGraph(id="widget_o_multi_dim_analysis", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px')),
+        dccGraph(id="widget_o_multi_dim_analysis", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px'))
         # htmlP(id = "scatter_output", style = list('font-size' = '12px'))
       )
     )
@@ -303,7 +303,7 @@ app$callback(
     
     ggplotly(plot_trend) %>% 
       layout(autosize = F, width = 320, height = 400,
-             legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
+             legend = list(orientation = "h", x = 0.05, y = -0.4, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)),
              yaxis = list(title = list(font = list(size = 12)),
@@ -372,7 +372,7 @@ app$callback(
     
     ggplotly(plot_trend) %>% 
       layout(autosize = F, width = 330, height = 380,
-             legend = list(orientation = "h", x = 0.05, y = -0.2, title = list(font = list(size = 9))),
+             legend = list(orientation = "h", x = 0.05, y = -0.4, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
                           tickfont = list(size = 10)),
              yaxis = list(title = list(font = list(size = 12)),
@@ -405,13 +405,13 @@ app$callback(
       infant_deaths = "Avg. Infant Deaths (per 1000 population)",
       # alcohol = "Alcohol Consumption (per capita)",
       # percentage_expenditure = "Expenditure (%)",
-      hepatitis_B = "Avg. Hepatitis B immunization (%) \n within first year year",
+      hepatitis_B = "Avg. Hepatitis B immunization (%) \n within first year",
       measles = "Avg. Measles reported (per 1000 population)",
       BMI = "Avg. Body Mass Index",
       under_five_deaths = "Avg. # of Deaths (below 5 yrs)",
-      polio = "Avg. % Polio immunization \n within first year year",
+      polio = "Avg. % Polio immunization \n within first year",
       # total_expenditure = "Total Expenditure",
-      diphtheria = "Avg. % Diphtheria immunization \n within first year year",
+      diphtheria = "Avg. % Diphtheria immunization \n within first year",
       hiv_aids = "Avg. Deaths per 1000 live births HIV/AIDS \n (0-4 years)",
       gdp = "Avg. GDP per capita (in USD)",
       population = "Avg. Population",
@@ -461,5 +461,6 @@ app$callback(
 # )
 
 app$run_server(host = '0.0.0.0', port = Sys.getenv('PORT', 8050))
+
 
 
