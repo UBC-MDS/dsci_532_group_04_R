@@ -171,7 +171,7 @@ effect_card <- dbcCard(
         dbcRow(list(dbcCol(color_widget), dbcCol(color_dropdown))),
         htmlBr(),
         dccGraph(id="widget_o_multi_dim_analysis", style=list('border-width'= '0', 'width' = '100%', 'height' = '400px')),
-        htmlP(id = "scatter_output", style = list('font-size' = '12px'))
+        # htmlP(id = "scatter_output", style = list('font-size' = '12px'))
       )
     )
   ), style = list("width"="23rem", "height"=640, 'margin-left'="1em")
@@ -204,7 +204,7 @@ app$callback(
   
 #' Creating Life Expectancy World Map based on the mean of the grouped countries
 #'
-#' @param year_range the selected year range
+#' @param year_range the selected year range. By default selects year 2000-2015.
 #'
 #' @return a world map displaying the mean of life expectancy for countries within the selected year range
 #'
@@ -267,6 +267,18 @@ app$callback(
     input("widget_l_continent", "value"),
     input("widget_l_color_axis", "value")
   ),
+  #' Generates year-wise Average Life Expectancy line plot for selected year range.
+  #' The lines are colored by continent or status, based on users' preference
+  #' By default, they are colored by continent
+  #' The users' can also select specific continents to focus on
+  #'
+  #' @param year_range the selected year range. By default selects year 2000-2015.
+  #' @param in_continent string vector to select one or more continent(s). By default selects all continents.
+  #' @param color_axis string to select the color axis. . By default selects continent.
+  #'
+  #' @return plotly object with year in x-axis, average life expectancy in y-axis and continent or
+  #' status in color axis.
+  #'
   function(year_range,  in_continent, color_axis) {
     chosen_starting_year = year_range[1]
     chosen_ending_year = year_range[2]
@@ -305,6 +317,15 @@ app$callback(
     input("widget_g_year", "value"),
     input("widget_l_country", "value")
   ),
+  #' Generates year-wise Average Life Expectancy line plot for selected year range
+  #' of a selected country, it's continent and entire world for comparison
+  #'
+  #' @param year_range the selected year range. By default selects year 2000-2015.
+  #' @param chosen_country string to select a country. Default: Canada
+  #'
+  #' @return plotly scatterplot object with average life expectancy in y-axis
+  #' and selected feature in x-axis
+  #'
   function(year_range,  chosen_country) {
     chosen_starting_year = year_range[1]
     chosen_ending_year = year_range[2]
@@ -366,54 +387,58 @@ app$callback(
     input("widget_l_multi_dim_x_axis", "value"),
     input("widget_l_multi_dim_color_axis", "value")
   ),
+  #' Generates a scatterplot for any selected feature vs mean life expectancy
+  #' The points are colored by continent or status, based on users' preference
+  #' By default, they are colored by continent
+  #' The users' can multiple features in x-axis
+  #'
+  #' @param year_range the selected year range. By default selects year 2000-2015.
+  #' @param x_axis string vector to select one feature. Default: Adult Mortality.
+  #' @param color_axis string to select the color axis. . By default selects continent.
+  #'
+  #' @return plotly object with year in x-axis, average life expectancy in y-axis and continent or
+  #' status in color axis.
+  #'
   function(year_range,  x_axis, color_axis) {
-    
     labels = list(
-      adult_mortality = "Adult Mortality (per 1000 population)",
-      infant_deaths = "Infant Deaths (per 1000 population)",
+      adult_mortality = "Avg. Adult Mortality (per 1000 population)",
+      infant_deaths = "Avg. Infant Deaths (per 1000 population)",
       # alcohol = "Alcohol Consumption (per capita)",
       # percentage_expenditure = "Expenditure (%)",
-      hepatitis_B = "% Hepatitis B immunization \n within first year year",
-      measles = "Measles reported  (per 1000 population)",
+      hepatitis_B = "Avg. Hepatitis B immunization (%) \n within first year year",
+      measles = "Avg. Measles reported (per 1000 population)",
       BMI = "Avg. Body Mass Index",
-      under_five_deaths = "# of Deaths (below 5 yrs)",
-      polio = "% Polio immunization \n within first year year",
+      under_five_deaths = "Avg. # of Deaths (below 5 yrs)",
+      polio = "Avg. % Polio immunization \n within first year year",
       # total_expenditure = "Total Expenditure",
-      diphtheria = "% Diphtheria immunization \n within first year year",
-      hiv_aids = "Deaths per 1000 live births HIV/AIDS \n (0-4 years)",
-      gdp = "GDP per capita (in USD)",
-      population = "Population",
-      schooling = "# of Schooling years",
-      income_composition_of_resources = "Human Development Index (0 to 1)"
+      diphtheria = "Avg. % Diphtheria immunization \n within first year year",
+      hiv_aids = "Avg. Deaths per 1000 live births HIV/AIDS \n (0-4 years)",
+      gdp = "Avg. GDP per capita (in USD)",
+      population = "Avg. Population",
+      schooling = "Avg. # of Schooling years",
+      income_composition_of_resources = "Avg. Human Development Index (0 to 1)"
     )
     
-    #print(x_axis)
-    #print(labels[[x_axis]])
-    
+    chosen_starting_year = year_range[1]
     chosen_ending_year = year_range[2]
     
     
-    na_count <- sum(is.na(dataset %>%
-                            filter(year == chosen_ending_year) %>%
-                            select(!!sym(x_axis)) %>%
-                            pull()))
     
-    if (na_count >= 1){
-      disclaimer1 = paste0("**Data missing for ", na_count," countries")
-    } else {
-      disclaimer1 <- ""
-    }
     
     plot_multi_dim <- dataset %>%
-      filter(year == chosen_ending_year) %>%
-      ggplot(aes(x=!!sym(x_axis), y=life_expectancy, color=!!sym(color_axis))) +
+      filter(year >= chosen_starting_year, year <= chosen_ending_year) %>%
+      group_by(!!sym(color_axis), country) %>%
+      summarise(avg_x_axis = mean(!!sym(x_axis)),
+                `Avg. Life Expectancy` = round(mean(life_expectancy), 2)) %>%
+      mutate(Country = country) %>%
+      ggplot(aes(x=avg_x_axis, y=`Avg. Life Expectancy`, color=!!sym(color_axis), label=Country)) +
       geom_point(size=2) +
-      labs(x=labels[[x_axis]], y="Life Expectancy", color="", title = disclaimer1) +
+      labs(x=labels[[x_axis]], y="Life Expectancy (Mean)", color="") +
       theme_bw() +
       ggthemes::scale_color_tableau() +
       theme(legend.position="bottom")
     
-    ggplotly(plot_multi_dim) %>% 
+    ggplotly(plot_multi_dim, tooltip=c("label", "y")) %>% 
       layout(autosize = F, width = 320, height = 400,
              legend = list(orientation = "h", x = 0.05, y = -0.4, title = list(font = list(size = 9))),
              xaxis = list(title = list(font = list(size = 12)),
@@ -425,15 +450,15 @@ app$callback(
   
 )
 
-app$callback(
-  output("scatter_output","children"),
-  list(input("widget_g_year","value")),
-  function(year_range){
-    chosen_ending_year = year_range[2]
-    return(paste0("* The data shown above is for the year of ", chosen_ending_year, " ."))
-    
-  }
-)
+# app$callback(
+#   output("scatter_output","children"),
+#   list(input("widget_g_year","value")),
+#   function(year_range){
+#     chosen_ending_year = year_range[2]
+#     return(paste0("* The data shown above is for the year of ", chosen_ending_year, " ."))
+#     
+#   }
+# )
 
 app$run_server(host = '0.0.0.0', port = Sys.getenv('PORT', 8050))
 
