@@ -42,7 +42,7 @@ card <- dbcCard(
 
 world_map = dbcCard(
   children = list(
-    dbcCardHeader("Life Expectancy Snapshot", className="cursive",style=list('font-weight'='900')),
+    dbcCardHeader("Average Life Expectancy Snapshot", className="cursive",style=list('font-weight'='900')),
     dbcCardBody(
       children = list(
         dccGraph(id="map_graph", style=list('border-width'= '0', 'width' = "44.5rem", 'height' = 270))
