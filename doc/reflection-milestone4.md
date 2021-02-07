@@ -28,6 +28,7 @@
 
 - Layout looks different for some machines with different resolution.
 - The multi-select drop down for continent in trend graph does not display all the values selected. The users have to refer to the legends to see what values are selected.
+- Last updated time at the bottom of the dashboard is based on the heroku server timezone and it may differ from users' timezone
 
 ## Areas of Improvement:
 
