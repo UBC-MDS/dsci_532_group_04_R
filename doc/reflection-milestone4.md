@@ -1,28 +1,44 @@
-
 # Reflection
+
+## Why R version was selected:
+
+- We found dash core components are easier to control on R version compared to the python version.
+- The R-version of our dashboard had more changes and up to date layout based on feedback received as it was built during milestone 3. Hence, it would have been slightly more time consuming to replicate them in the python version from milestone 2.
 
 ## Implemented/ Changes made based on feedback:
 
-- Added DocString for all the functions
-- Scales of our graphs have been reduced
-- Layout of the landing page has been improved
+- Added DocString for all the functions.
+- Added dashboard information at the bottom of the dashboard.
+- Layout of the dashboard was modified to make the grids more symmetric.
+- Improved the look and feel of the dashboard.
 - Scatterplot
-  - Added appropriate units for x-axis of the scatter-plot
-  - The scatter-plot uses the entire date range and averages the x and y axis feature values
-  - Removed the disclaimers as they were not relevant anymore
-  - The tooltip text shows country and average life expectancy
+  - Added appropriate units for x-axis of the scatter-plot.
+  - The scatter-plot uses the entire date range and averages the x and y axis feature values.
+  - Removed the disclaimers as they were not relevant anymore.
+  - The tooltip text shows country and average life expectancy.
   
 - Interactive map
-  - All countries are showing up on the map together with the mean life expectancy for selected years
-
-## Not yet implemented:
-
-- Toggle collapse menu
-
-## Known issues (intend to fix this in the later milestone):
-
-- Layout looks different for different machines (Windows, Linux and MacOS)
-- Improve layout to reduce scrolling of the dashboard
+  - Resized to remove whitespaces.
+  - Plot and legend title were removed as they were redundant.
+  - The disclaimer on the map plot was removed as it was not relevant.
+  - Fixed the scale of the color axis for fair comparison when different year range was selected.
 
 
-Our dashboard does well in enabling a user to perform multi-dimensional analysis to understand the factors affecting life expectancy. However, if we are given a new column in our dataset, our dashboard may need additional enhancement. We will make improvements based on TA feedbacks and solve previous known issues. After building the first dashboard with Python, our second dashboard building using R is much easier. We think using R to manage the R layout is much easier compared to Python, as the syntax for R is more friendly. However, it is harder to manage the size, title, and legend position using Plotly in R. We also received feedbacks regarding our plot axis label to be more informative, but, we will try to address the suggestion based on our time width. We will address Ta's feedback on priority.
+## Known issues:
+
+- Layout looks different for some machines with different resolution.
+- The multi-select drop down for continent in trend graph does not display all the values selected. The users have to refer to the legends to see what values are selected.
+
+## Areas of Improvement:
+
+- Performance enhancement using the tips from Lecture 8
+
+## Features not implemented
+
+- We did not include the toggle button to collapse the global filter widget. This is because our final dashboard version does not have a global filter widget which takes up the entire left side of the dashboards. Instead, the global filter section takes up the top left position of the dashboard grid.
+
+## Summary
+
+- Based on feedback we received so far, we feel that it is easy to use our dashboard.
+- Most of the feedback received were very helpful and made our app much more enhanced than we have planned.
+- We have received multiple feedback for the scatter-plot and graph, however they were on top of the enhancements we were doing and helped making them more polished than the initial version
