@@ -16,4 +16,4 @@ The proposal document could be found
 
 ## Dashboard Overview
 
-<img src="figures/app.gif" width="6526" />
+<img src="figures/app_demo.gif" width="6526" />
